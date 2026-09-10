@@ -1,12 +1,13 @@
 """
 Edge Rewards Automation v2 - laptop scheduler version.
 - Picks 20 fresh queries automatically by date (no manual edit).
-- Config via env vars: NUM_SEARCHES, INTERVAL, REWARDS_DATE, DRY_RUN.
+- Random wait 4-7s between each query (human-like).
+- Config via env vars: NUM_SEARCHES, MIN_INTERVAL, MAX_INTERVAL, REWARDS_DATE, DRY_RUN.
 - Logs to logs/YYYY-MM-DD.log
 Usage:
   python edge_rewards_automation.py
   DRY_RUN=1 python edge_rewards_automation.py
-  NUM_SEARCHES=20 INTERVAL=8 python edge_rewards_automation.py
+  NUM_SEARCHES=20 MIN_INTERVAL=4 MAX_INTERVAL=7 python edge_rewards_automation.py
 """
 import logging
 import os
@@ -24,7 +25,15 @@ sys.path.insert(0, str(BASE_DIR))
 from daily_queries import get_daily_queries
 
 NUM_SEARCHES = int(os.getenv("NUM_SEARCHES", "20"))
-INTERVAL = float(os.getenv("INTERVAL", "8"))
+MIN_INTERVAL = float(os.getenv("MIN_INTERVAL", os.getenv("INTERVAL", "4")))
+MAX_INTERVAL = float(os.getenv("MAX_INTERVAL", "7"))
+# clamp to sane bounds: 4 <= wait < 7+ (user spec)
+MIN_INTERVAL = max(4.0, MIN_INTERVAL)
+MAX_INTERVAL = min(9.0, max(MIN_INTERVAL + 0.1, MAX_INTERVAL))
+if MAX_INTERVAL > 7.0:
+    MAX_INTERVAL = 7.0
+    if MIN_INTERVAL > MAX_INTERVAL:
+        MIN_INTERVAL = 4.0
 REWARDS_DATE = os.getenv("REWARDS_DATE", date.today().isoformat())
 DRY_RUN = os.getenv("DRY_RUN", "0") == "1"
 
@@ -82,8 +91,8 @@ def perform_search(query, is_first_search=False):
         return False
 
 
-def run_automation(num_searches=NUM_SEARCHES, interval=INTERVAL):
-    log.info(f"Starting automation date={REWARDS_DATE} searches={num_searches} interval={interval} dry_run={DRY_RUN}")
+def run_automation(num_searches=NUM_SEARCHES, min_interval=MIN_INTERVAL, max_interval=MAX_INTERVAL):
+    log.info(f"Starting automation date={REWARDS_DATE} searches={num_searches} wait_random={min_interval}-{max_interval}s dry_run={DRY_RUN}")
     if not DRY_RUN:
         log.info("Make sure you are SIGNED IN to Microsoft account in Edge.")
     setup_edge_browser()
@@ -95,7 +104,9 @@ def run_automation(num_searches=NUM_SEARCHES, interval=INTERVAL):
         if perform_search(query, is_first_search=(i == 1)):
             ok += 1
         if i < len(queries):
-            time.sleep(max(1, interval + random.uniform(-0.5, 0.5)))
+            wait_time = random.uniform(min_interval, max_interval)
+            log.info(f"Waiting {wait_time:.1f}s before next...")
+            time.sleep(wait_time)
     log.info(f"Done: {ok}/{len(queries)} successful. Log: {LOG_FILE}")
     print(f"\nDone {ok}/{len(queries)}. Log: {LOG_FILE}")
 
