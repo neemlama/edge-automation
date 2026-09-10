@@ -1,0 +1,47 @@
+╔═══════════════════════════════════════════════════════════════════╗
+║  EDGE REWARDS AUTOMATION - SETUP INSTRUCTIONS                     ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+Edge WebDriver is required to run this automation script.
+
+MANUAL INSTALLATION STEPS:
+═════════════════════════════════════════════════════════════════════
+
+Step 1: Download Edge WebDriver
+   • Open your web browser
+   • Go to: https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/
+   • Download version: 143.0.3650.96 (matches your Edge browser)
+   
+   Direct download link:
+   https://msedgedriver.azureedge.net/143.0.3650.96/edgedriver_win64.zip
+
+Step 2: Extract the ZIP file
+   • Right-click the downloaded ZIP file
+   • Select "Extract All..."
+   • Extract to any location
+
+Step 3: Copy the driver
+   • Find the file named: msedgedriver.exe
+   • Copy it to this folder:
+     C:\Users\wecal\OneDrive\Documents\Coding\cool_projects\edge\
+
+Step 4: Run the script
+   • Open terminal in this folder
+   • Run: python edge_rewards_automation.py
+
+═════════════════════════════════════════════════════════════════════
+
+TROUBLESHOOTING:
+   
+   • If download links don't work, you may need to:
+     - Use a different network (mobile hotspot, etc.)
+     - Use a different browser
+     - Disable firewall/antivirus temporarily
+   
+   • Make sure msedgedriver.exe is in the SAME folder as the Python script
+   
+   • Your Edge version: 143.0.3650.96
+   • Driver version needed: 143.0.3650.96
+   • These MUST match!
+
+═════════════════════════════════════════════════════════════════════
